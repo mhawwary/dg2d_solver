@@ -35,7 +35,7 @@ void DG_2D_DIFFUS_SOLVER::setup_solver(MeshData*& meshdata_, SimData& osimdata_)
         Nquad_1d = 1;
         break;
     case 2: // p1
-        Nquad_1d = 2;
+        Nquad_1d = 2;  //2
         break;
     case 3:  // p2
         Nquad_1d = 3;
