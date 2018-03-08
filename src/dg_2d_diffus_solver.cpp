@@ -132,7 +132,7 @@ void DG_2D_DIFFUS_SOLVER::read_sparsematrix(MYSPARSE_MATRIX& smatrix_
                                              ,std::string& readfname_){
 
     double h2=0;
-    h2 = 1.0/pow(grid_->facelist[0].Af,2); // 1/h^2
+    h2 = 1.0/grid_->elemlist[0].Vc; // 1/h^2
     int i,j;
     double temp_val=0;
     int nnz_row_index_;
@@ -557,6 +557,7 @@ void DG_2D_DIFFUS_SOLVER::CalcTimeStep(){
     std::cout << "Upwind parameter  : "<< simdata_->upwind_param_<< std::endl;
     std::cout << "Penalty parameter : "<< eta_face << std::endl;
     std::cout << "Poly GaussQuad order  : "<< Nquad_2d << std::endl;
+    std::cout << "Jacobian: " <<grid_->elemlist[0].Jc<<std::endl;
     std::cout <<"===============================================\n";
 }
 
@@ -684,6 +685,157 @@ void DG_2D_DIFFUS_SOLVER::Compute_vertex_sol(){
 
     return;
 }
+
+double DG_2D_DIFFUS_SOLVER::L1_error_projected_sol(){
+
+    register int j; int i;
+    double L1_error=0.0,elem_error=0.0,II=0.0,VV_=0.0,q_ex,q_n;
+
+    for(j=0; j<grid_->Nelem; j++){
+
+        elem_error=0.0;
+        for(i=0; i<quad_2d_.Nq; i++) {
+            q_ex = evalSolution(&Qex_proj[j*Ndof]
+                    ,quad_2d_.Gaus_pts[0][i], quad_2d_.Gaus_pts[1][i]);
+            q_n = evalSolution(&Qn[j*Ndof]
+                    ,quad_2d_.Gaus_pts[0][i], quad_2d_.Gaus_pts[1][i]);
+            elem_error += quad_2d_.Gaus_wts[i] * fabs(q_ex - q_n);
+        }
+
+        II  += (grid_->elemlist[j].Jc * elem_error) ;
+        VV_ += grid_->elemlist[j].Vc;
+    }
+    L1_error = II/VV_;
+
+    return L1_error;
+}
+
+double DG_2D_DIFFUS_SOLVER::L2_error_projected_sol(){
+
+    register int j; int i;
+    double L2_error=0.0,elem_error=0.0,II=0.0,VV_=0.0,q_ex,q_n;
+
+    for(j=0; j<grid_->Nelem; j++){
+
+        elem_error=0.0;
+        for(i=0; i<quad_2d_.Nq; i++) {
+            q_ex = evalSolution(&Qex_proj[j*Ndof]
+                    ,quad_2d_.Gaus_pts[0][i], quad_2d_.Gaus_pts[1][i]);
+            q_n = evalSolution(&Qn[j*Ndof]
+                    ,quad_2d_.Gaus_pts[0][i], quad_2d_.Gaus_pts[1][i]);
+            elem_error += quad_2d_.Gaus_wts[i] * pow((q_ex - q_n),2);
+        }
+
+        II  += (grid_->elemlist[j].Jc * elem_error) ;
+        VV_ += grid_->elemlist[j].Vc;
+    }
+    L2_error = sqrt(II/VV_);
+
+    return L2_error;
+}
+
+void DG_2D_DIFFUS_SOLVER::dump_errors(double& L1_proj_sol_,double& L2_proj_sol_){
+
+    char *fname=nullptr;
+    fname = new char[150];
+
+    if(simdata_->Sim_mode=="error_analysis_CFL"){
+        sprintf(fname,"%serrors/errors_CFL%1.3e_eta%1.2f_t%1.3f.dat"
+                ,simdata_->case_postproc_dir.c_str()
+                ,CFL
+                ,eta_face
+                ,simdata_->t_end_);
+
+        FILE* solerror_out=fopen(fname,"at+");
+        fprintf(solerror_out, "%d %2.10e %2.10e\n",grid_->Nelem,L1_proj_sol_,L2_proj_sol_);
+        fclose(solerror_out);
+        emptyarray(fname);
+
+    }else if(simdata_->Sim_mode=="error_analysis_dt"){
+        sprintf(fname,"%serrors/errors_N%d_dt%1.3e_eta%1.2f_t%1.3f.dat"
+                ,simdata_->case_postproc_dir.c_str()
+                ,grid_->Nelem
+                ,time_step
+                ,eta_face
+                ,simdata_->t_end_);
+
+        FILE* solerror_out=fopen(fname,"w");
+        fprintf(solerror_out, "%2.10e %2.10e\n",L1_proj_sol_, L2_proj_sol_);
+        fclose(solerror_out);
+        emptyarray(fname);
+
+        // Dumping all errors in one file as a function of dt:
+        //--------------------------------------------------------
+        fname = new char[100];
+        sprintf(fname,"%serrors/errors_N%d_alldt_eta%1.2f_t%1.3f.dat"
+                ,simdata_->case_postproc_dir.c_str()
+                ,grid_->Nelem
+                ,eta_face
+                ,simdata_->t_end_);
+
+        solerror_out=fopen(fname,"at+");
+        fprintf(solerror_out, "%1.7e %2.10e %2.10e\n",time_step,L1_proj_sol_,L2_proj_sol_);
+        fclose(solerror_out);
+        emptyarray(fname);
+
+         // Dumping all errors in one file as a function of Nelem:
+         //--------------------------------------------------------
+         fname = new char[100];
+         sprintf(fname,"%serrors/errors_dt%1.3e_eta%1.2f_t%1.3f.dat"
+                 ,simdata_->case_postproc_dir.c_str()
+                 ,time_step
+                 ,eta_face
+                 ,simdata_->t_end_);
+
+         solerror_out=fopen(fname,"at+");
+         fprintf(solerror_out, "%d %2.10e %2.10e\n",grid_->Nelem,L1_proj_sol_,L2_proj_sol_);
+         fclose(solerror_out);
+         emptyarray(fname);
+
+    }else if( simdata_->Sim_mode=="test" || simdata_->Sim_mode=="normal" ){
+        sprintf(fname,"%serrors/errors_N%d_CFL%1.3e_eta%1.2f_t%1.3f.dat"
+                ,simdata_->case_postproc_dir.c_str()
+                ,grid_->Nelem
+                ,CFL
+                ,eta_face
+                ,simdata_->t_end_);
+
+        FILE* solerror_out=fopen(fname,"w");
+        fprintf(solerror_out, "%2.10e %2.10e\n",L1_proj_sol_,L2_proj_sol_);
+        fclose(solerror_out);
+        emptyarray(fname);
+
+    }else if(simdata_->Sim_mode=="error_analysis_eta"){
+        sprintf(fname,"%serrors/errors_N%d_CFL%1.3e_eta%1.2f_t%1.3f.dat"
+                ,simdata_->case_postproc_dir.c_str()
+                ,grid_->Nelem
+                ,CFL
+                ,eta_face
+                ,simdata_->t_end_);
+
+        FILE* solerror_out=fopen(fname,"w");
+        fprintf(solerror_out, "%2.10e %2.10e\n",L1_proj_sol_,L2_proj_sol_);
+        fclose(solerror_out);
+        emptyarray(fname);
+
+        // Dumping all errors in one file as a function of beta:
+        //--------------------------------------------------------
+        fname = new char[100];
+        sprintf(fname,"%serrors/errors_N%d_CFL%1.3e_alleta_t%1.3f.dat"
+                ,simdata_->case_postproc_dir.c_str()
+                ,grid_->Nelem
+                ,CFL
+                ,simdata_->t_end_);
+
+        solerror_out=fopen(fname,"at+");
+        fprintf(solerror_out, "%1.2f %2.10e %2.10e\n",eta_face,L1_proj_sol_,L2_proj_sol_);
+        fclose(solerror_out);
+        emptyarray(fname);
+    }
+
+    return;
+}
+
 
 //Debug functions:
 void DG_2D_DIFFUS_SOLVER::test_local_xy_coord(){

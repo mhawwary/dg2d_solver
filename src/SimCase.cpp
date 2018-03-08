@@ -184,6 +184,7 @@ void SimCase::RunSim(){
                 local_iter=0;
             }
         }
+        //PostProcess(time_solver_->GetIter());
 
     }else if(simdata.unsteady_data_print_flag_==2){
         while ( fabs(gtime - simdata.t_end_) > (dt_+temp_tol) ){
@@ -211,17 +212,27 @@ void SimCase::RunSim(){
 
         PostProcess(time_solver_->GetIter());
     }
-    std::cout<<"\n";
-    PostProcess(time_solver_->GetIter());
+    dump_exactsol_field_data(dg_solver_->GetVertexExactSol()
+                          ,time_solver_->GetIter()
+                          ,simdata.case_postproc_dir,grid_data);
+    double L1_proj=dg_solver_->GetL1projSolerror();
+    double L2_proj=dg_solver_->GetL2projSolerror();
+    std::cout<<"\nL1_proj: "<<L1_proj<<"   "<<"L2_proj: "<<L2_proj<<"\n";
+    dg_solver_->dump_errors(L1_proj,L2_proj);
     return;
 }
 
 void SimCase::PostProcess(const int& iter_){
 
-    if(iter_==simdata.maxIter_)
-        dump_exactsol_field_data(dg_solver_->GetVertexExactSol()
-                              ,time_solver_->GetIter()
-                              ,simdata.case_postproc_dir,grid_data);
+    if(iter_==simdata.maxIter_){
+//        dump_exactsol_field_data(dg_solver_->GetVertexExactSol()
+//                              ,time_solver_->GetIter()
+//                              ,simdata.case_postproc_dir,grid_data);
+//        double L1_proj=dg_solver_->GetL1projSolerror();
+//        double L2_proj=dg_solver_->GetL2projSolerror();
+//        std::cout<<"\nL1_proj: "<<L1_proj<<"   "<<"L2_proj: "<<L2_proj<<"\n";
+//        dg_solver_->dump_errors(L1_proj,L2_proj);
+    }
 
     dg_solver_->Compute_vertex_sol();
     dump_field_data(dg_solver_->GetVertexNumSol()

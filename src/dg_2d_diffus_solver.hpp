@@ -28,8 +28,9 @@ public:
                                     ,double *o_qn_);
 
     virtual void Compute_vertex_sol();
-//    virtual double L1_error_projected_sol();
-//    virtual double L2_error_projected_sol();
+    virtual double L1_error_projected_sol();
+    virtual double L2_error_projected_sol();
+    virtual void dump_errors(double& L1_proj_sol_,double& L2_proj_sol_);
 
     virtual double eval_init_sol(const double& xx_,const double& yy_);
     virtual double eval_1dbasis_poly(const double& xi_, const int& basis_k_);

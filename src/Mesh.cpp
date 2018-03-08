@@ -888,6 +888,7 @@ void Mesh::compute_cell_volume_center(const int &ii){
     if(Volume < 0) FatalErrorST("Negative Volume");
 
     grid_data_->elemlist[ii].Vc = Volume;
+    grid_data_->elemlist[ii].Jc = Volume / 4.0; // for unifrom cartesian grids
 
     xc = xc/(3.0 * Volume);
     yc = yc/(3.0 * Volume);

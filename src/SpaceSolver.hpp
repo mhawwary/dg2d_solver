@@ -82,6 +82,20 @@ public:
         return phy_time;
     }
 
+    double GetL1projSolerror(){
+        double o_L1_=0.0;
+        o_L1_=L1_error_projected_sol();
+        return o_L1_;
+    }
+
+    double GetL2projSolerror(){
+        double o_L2_=0.0;
+        o_L2_=L2_error_projected_sol();
+        return o_L2_;
+    }
+
+    virtual void dump_errors(double& L1_proj_sol_,double& L2_proj_sol_)=0;
+
 protected:
     //Element mapping functions:
     virtual void eval_local_xy_coord(const int& oelemID
@@ -109,6 +123,9 @@ protected:
     virtual void Compute_exact_vertex_sol()=0;
     virtual void UpdateResidOneCell(const int& eID_, double* resid_
                                     ,double *o_qn_)=0;
+
+    virtual double L1_error_projected_sol()=0;
+    virtual double L2_error_projected_sol()=0;
 
     /* These pointers are passed to the space solver
    *  and are not supposed to be freed in this scope

@@ -145,6 +145,7 @@ struct Elem{
     //int *to_neigh_elem=nullptr; // neighbour elements ID
 
     double Vc=1.0;  // cell volume
+    double Jc=1.0;  // cell Jacobian
 
     double Xc=0.0; // cell center xc
     double Yc=0.0; // cell center yc
@@ -175,6 +176,7 @@ struct Elem{
         Nneigh_elem = RElem.Nneigh_elem;
 
         Vc = RElem.Vc;
+        Jc = RElem.Jc;
         Xc = RElem.Xc;
         Yc = RElem.Yc;
 
@@ -258,6 +260,8 @@ struct MeshData{
     int Npolygon=0;
     int NpostProc=0;
     int Nnodes_postproc=0;
+
+    double Vc_tot=0.0;
 
     double *Xn=nullptr; // node x coord
     double *Yn=nullptr; // node y coord
