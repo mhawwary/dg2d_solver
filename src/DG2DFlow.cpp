@@ -21,9 +21,7 @@ int main(int argc, char** argv){
     Case.setup(input_fname);  // Setup and parse input parameters
     Case.InitSim();           // Preprocessing steps
     Case.RunSim();            // Main Solution Loop
-    int iter=0;
-    double Res=0.0;
-    Case.PostProcess(iter,Res);       // Dumping Simulation Post Processing data
+    //Case.PostProcess(iter);       // Dumping Simulation Post Processing data
 
     return 0;
 }

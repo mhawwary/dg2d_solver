@@ -439,30 +439,27 @@ void DG_2D_DIFFUS_SOLVER::Compute_exact_vertex_sol(){
 
 void DG_2D_DIFFUS_SOLVER::CalcTimeStep(){
 
-//    compute_uniform_cont_sol();
-//    double TV_ = compute_totalVariation();
-
     double dx = (simdata_->xf_-simdata_->x0_)/(simdata_->Nnodes_x_-1);
     double dy = (simdata_->yf_-simdata_->y0_)/(simdata_->Nnodes_y_-1);
-    double dx2 = pow(dx,2);
-    double dy2 = pow(dy,2);
-    double radius_advec_x=0.0, radius_diffus_x =0.0,radius_advec_y=0.0, radius_diffus_y =0.0;
+    double Vol_ = dx * dy;
+    double radius_advec_x=0.0,radius_advec_y=0.0
+            ,radius_advec_=0.0,radius_diffus_=0.0;
 
     T_period = (simdata_->xf_ - simdata_->x0_) / simdata_->a_wave_x_;
+    radius_diffus_ = simdata_->thermal_diffus / Vol_ ;
     radius_advec_x =  simdata_->a_wave_x_ / dx  ;
-    radius_diffus_x = 0.5*simdata_->thermal_diffus / dx2 ;
     radius_advec_y =  simdata_->a_wave_y_ / dy  ;
-    radius_diffus_y = 0.5*simdata_->thermal_diffus / dy2 ;
+    radius_advec_ = 0.5*(radius_advec_x+radius_advec_y); // average radius ( not accurate )
 
     if(simdata_->calc_dt_flag==1){   // use CFL as input
 
         CFL = simdata_->CFL_;
         if(simdata_->calc_dt_adv_diffus_flag==0)   // based on advection effect only
-            time_step = CFL / (radius_advec_x + radius_advec_y) ;
+            time_step = CFL / radius_advec_ ;
         else if(simdata_->calc_dt_adv_diffus_flag==1)  // based on diffusion effect only
-            time_step = CFL /  (radius_diffus_x + radius_diffus_y) ;
+            time_step = CFL /  radius_diffus_ ;
         else if(simdata_->calc_dt_adv_diffus_flag==2)  // based on combined advection and diffusion effects
-            time_step = CFL / ( radius_advec_x + radius_diffus_x + radius_advec_y + radius_diffus_y );
+            time_step = CFL / ( radius_advec_ + radius_diffus_ );
         else
             FatalError_exit("Wrong Calc dt adv diffus flag");
 
@@ -475,11 +472,11 @@ void DG_2D_DIFFUS_SOLVER::CalcTimeStep(){
         last_time_step = time_step;
 
         if(simdata_->calc_dt_adv_diffus_flag==0)
-            CFL = time_step * (radius_advec_x + radius_advec_y)  ;
+            CFL = time_step * radius_advec_  ;
         else if(simdata_->calc_dt_adv_diffus_flag==1)
-            CFL = time_step * (radius_diffus_x + radius_diffus_y) ;
+            CFL = time_step * radius_diffus_ ;
         else if(simdata_->calc_dt_adv_diffus_flag==2)
-            CFL = time_step * ( radius_advec_x + radius_diffus_x + radius_advec_y + radius_diffus_y );
+            CFL = time_step * ( radius_advec_+ radius_diffus_ );
         else
             FatalError_exit("Wrong Calc dt adv diffus flag");
 

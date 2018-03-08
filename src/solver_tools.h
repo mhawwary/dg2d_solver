@@ -11,10 +11,7 @@ double L2norm(const int& Nelem_, const int& Ndof_per_elem, double** quantity, do
 
 double L2norm_perdof(const int& Nelem_, double* quantity);
 
-void dump_field_data(double **Qv, const int& oiter
-                     ,std::string& dump_dir_, MeshData*& grid_data_);
-
 void dump_field_data(double *Qv, const int& oiter
                      , std::string& dump_dir_, MeshData*& grid_data_);
-void dump_field_data_exact(double *Qv, const int& oiter
+void dump_exactsol_field_data(double *Qv, const int& oiter
                      , std::string& dump_dir_, MeshData*& grid_data_);

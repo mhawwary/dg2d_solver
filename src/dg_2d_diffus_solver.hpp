@@ -28,23 +28,8 @@ public:
                                     ,double *o_qn_);
 
     virtual void Compute_vertex_sol();
-    //   virtual void Compute_cont_sol(){}
-    //   virtual double ComputePolyError();
-    //   virtual double L1_error_projected_sol();
-    //   virtual double L2_error_projected_sol();
-    //   virtual double L1_error_average_sol();
-    //   virtual double L2_error_average_sol();
-    //   virtual double L1_error_nodal_gausspts();
-    //   virtual double L2_error_nodal_gausspts();
-    //   virtual double L1_error_nodal_gausspts_proj();
-    //   virtual double L2_error_nodal_gausspts_proj();
-    //   virtual void print_cont_vertex_sol();
-    //   virtual void print_average_sol();
-    //   virtual void dump_errors(double& L1_proj_sol_,double& L2_proj_sol_
-    //                    ,double& L1_aver_sol_,double& L2_aver_sol_
-    //                    ,double& L1_nodal_gausspts, double& L2_nodal_gausspts);
-    //   virtual void dump_discont_sol();
-    //   virtual void dump_timeaccurate_sol();
+//    virtual double L1_error_projected_sol();
+//    virtual double L2_error_projected_sol();
 
     virtual double eval_init_sol(const double& xx_,const double& yy_);
     virtual double eval_1dbasis_poly(const double& xi_, const int& basis_k_);

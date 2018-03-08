@@ -61,59 +61,6 @@ double L2norm_perdof(const int& Nelem_, double* quantity_diff){
     return L2norm_;
 }
 
-void dump_field_data(double **Qv, const int& oiter
-                     ,std::string& dump_dir_, MeshData*& grid_data){
-
-    register int i; int j;
-
-    char *fname=nullptr; fname=new char[100];
-
-    sprintf(fname,"%s/field_output/contour_data_%d.plt"
-            ,dump_dir_.c_str(),oiter);
-
-    FILE*  outfile=fopen(fname,"wt");
-
-    // Printing the header first:
-    //-------------------------------------
-    fprintf(outfile, "VARIABLES = \"X\",\"Y\",\"RHO\",\"u\",\"v\",\"Cp\",\"M\"\n");
-
-    fprintf(outfile, "ZONE N=%d, E=%d, F=FEPOINT, ET=QUADRILATERAL\n"
-            , grid_data->Nnodes_postproc
-            , grid_data->NpostProc);
-
-    // Printing the solution variables at the nodes:
-    //------------------------------------------------
-    for(i=0; i<grid_data->Nnodes_postproc; i++){
-
-        fprintf(outfile,"%e %e %e %e %e %e %e\n"
-                ,grid_data->post_Xn[i] ,grid_data->post_Yn[i]
-                , Qv[i][0], Qv[i][1], Qv[i][2], Qv[i][3], Qv[i][4]);
-    }
-
-    fprintf(outfile,"\n");
-
-    // printing connectivity information:
-    //-------------------------------------
-    int node_id;
-
-    for(i=0; i<grid_data->NpostProc; i++)
-    {
-        for(j=0; j<grid_data->post_proc_elemlist[i].n_local_nodes; j++){
-            node_id = grid_data->post_proc_elemlist[i].to_node[j];
-            fprintf(outfile, "%d ",node_id+1);
-        }
-
-        if(grid_data->post_proc_elemlist[i].n_local_nodes==3)
-            fprintf(outfile, "%d",node_id+1);
-        fprintf(outfile,"\n");
-    }
-
-    fclose(outfile);
-    emptyarray(fname);
-
-    return;
-}
-
 void dump_field_data(double *Qv, const int& oiter
                      , std::string& dump_dir_, MeshData*& grid_data){
 
@@ -165,7 +112,7 @@ void dump_field_data(double *Qv, const int& oiter
     return;
 }
 
-void dump_field_data_exact(double *Qv, const int& oiter
+void dump_exactsol_field_data(double *Qv, const int& oiter
                      , std::string& dump_dir_, MeshData*& grid_data){
 
     register int i; int j;

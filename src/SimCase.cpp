@@ -100,9 +100,7 @@ void SimCase::InitSim(){
     //-----------------------------------------------------------------
     dg_solver_->setup_solver(grid_data,simdata);
     dg_solver_->InitSol();
-    dg_solver_->Compute_vertex_sol();
-    dump_field_data(dg_solver_->GetVertexNumSol()
-                    ,0,simdata.case_postproc_dir,grid_data);
+    PostProcess(0);
     time_solver_->setupTimeSolver(dg_solver_,&simdata);
 //    simdata.dump_python_inputfile();
 
@@ -161,10 +159,7 @@ void SimCase::RunSim(){
 
     if(n_iter_print==1){
         printf("\nIter No:%d, time: %f",time_solver_->GetIter(),gtime);
-        dg_solver_->Compute_vertex_sol();
-        dump_field_data(dg_solver_->GetVertexNumSol()
-                        ,time_solver_->GetIter()
-                        ,simdata.case_postproc_dir,grid_data);
+        PostProcess(time_solver_->GetIter());
         local_iter=0;
     }
 
@@ -183,10 +178,7 @@ void SimCase::RunSim(){
                 time_solver_->space_solver->UpdatePhyTime(dt_last_print);
                 gtime=dg_solver_->GetPhyTime();
                 printf("\nIter No:%d, time: %1.5f",time_solver_->GetIter(),gtime);
-                dg_solver_->Compute_vertex_sol();
-                dump_field_data(dg_solver_->GetVertexNumSol()
-                                ,time_solver_->GetIter()
-                                ,simdata.case_postproc_dir,grid_data);
+                PostProcess(time_solver_->GetIter());
                 time_solver_->Set_time_step(dt_);
                 //time_solver_->Reset_iter(time_solver_->GetIter()-1);
                 local_iter=0;
@@ -203,10 +195,7 @@ void SimCase::RunSim(){
 
             if(local_iter%n_iter_print==0){
                 printf("\nIter No:%d, time: %1.5f",time_solver_->GetIter(),gtime);
-                dg_solver_->Compute_vertex_sol();
-                dump_field_data(dg_solver_->GetVertexNumSol()
-                                ,time_solver_->GetIter()
-                                ,simdata.case_postproc_dir,grid_data);
+                PostProcess(time_solver_->GetIter());
                 local_iter=0;
             }
         }
@@ -220,71 +209,24 @@ void SimCase::RunSim(){
         else
             time_solver_->space_solver->UpdatePhyTime(dt_);
 
-        dg_solver_->Compute_vertex_sol();
-        dump_field_data(dg_solver_->GetVertexNumSol()
-                        ,time_solver_->GetIter()
-                        ,simdata.case_postproc_dir,grid_data);
+        PostProcess(time_solver_->GetIter());
     }
     std::cout<<"\n";
-    dump_field_data_exact(dg_solver_->GetVertexExactSol()
-                          ,time_solver_->GetIter()
-                          ,simdata.case_postproc_dir,grid_data);
+    PostProcess(time_solver_->GetIter());
     return;
 }
 
-void SimCase::PostProcess(const int& iter_, double& Resid_sum_){
+void SimCase::PostProcess(const int& iter_){
 
-//    double *Qv_exact=nullptr;
-//    Qv_exact=dg_solver_->GetVertexExactSol();
-//    dump_field_data_exact(Qv_exact,iter_,simdata.case_postproc_dir,grid_data);
-//    double dt_min,dt_max;
+    if(iter_==simdata.maxIter_)
+        dump_exactsol_field_data(dg_solver_->GetVertexExactSol()
+                              ,time_solver_->GetIter()
+                              ,simdata.case_postproc_dir,grid_data);
 
-//    double cont_Resid_norm
-//            ,Xmom_Resid_norm,Ymom_Resid_norm
-//            ,Energy_Resid_norm;
-
-//    double **Qv=nullptr,*p_wall_=nullptr, *tau_xx_wall_=nullptr, *tau_xy_wall_=nullptr, *tau_yy_wall_=nullptr, *Cf_=nullptr;
-
-//    cont_Resid_norm   = time_solver->GetContinuityResNorm(2);
-//    Xmom_Resid_norm   = time_solver->GetMomentumXResNorm(2);
-//    Ymom_Resid_norm   = time_solver->GetMomentumYResNorm(2);
-//    Energy_Resid_norm = time_solver->GetEnergyResNorm(2);
-//    Resid_sum_        = time_solver->GetResNorm(2);
-
-//    printf("\nL2, Iter: %d, Rsum:%e, rho:%e, rhoU:%e, rhoV:%e, E:%e"
-//           ,iter_,Resid_sum_,cont_Resid_norm
-//           , Xmom_Resid_norm,Ymom_Resid_norm
-//           ,Energy_Resid_norm);
-
-//    dump_resid_L2norm(iter_,Resid_sum_,cont_Resid_norm
-//                      ,Xmom_Resid_norm,Ymom_Resid_norm
-//                      ,Energy_Resid_norm);
-
-//    if(iter_%simdata.forces_print_freq==0){
-//        fvm_space_solver->Compute_vertex_sol(iter_);
-//        Qv = fvm_space_solver->GetVertexSolution();
-//        //fvm_space_solver->Get_wall_stress_tensor(p_wall_,tau_xx_wall_,tau_xy_wall_,tau_yy_wall_);
-//        p_wall_ = fvm_space_solver->Get_wall_pressure();
-//        tau_xx_wall_ = fvm_space_solver->Get_tau_xx();
-//        tau_xy_wall_ = fvm_space_solver->Get_tau_xy();
-//        tau_yy_wall_ = fvm_space_solver->Get_tau_yy();
-//        Cf_ = fvm_space_solver->Get_wall_skin_friction();
-//        dump_wall_data(iter_,Qv,p_wall_,tau_xx_wall_,tau_xy_wall_,tau_yy_wall_,Cf_);
-//    }
-
-//    if(iter_%simdata.fields_print_freq==0){
-//        fvm_space_solver->Compute_vertex_sol(iter_);
-//        Qv = fvm_space_solver->GetVertexSolution();
-//        dump_field_data(Qv,iter_);
-//    }
-
-//    if(simdata.use_local_timeStep==1 && iter_<=5000){
-//        //if(iter_>10000) fvm_space_solver->SetCFL(1.25*simdata.CFL_);
-//        time_solver->update_local_timestep();
-//        dt_min = time_solver->getdt_min();
-//        dt_max = time_solver->getdt_max();
-//        printf("\ndt_min: %e,  dt_max: %e",dt_min, dt_max);
-//    }
+    dg_solver_->Compute_vertex_sol();
+    dump_field_data(dg_solver_->GetVertexNumSol()
+                    ,iter_
+                    ,simdata.case_postproc_dir,grid_data);
 
     return;
 }

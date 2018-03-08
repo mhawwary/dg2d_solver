@@ -22,7 +22,7 @@ public:
   void setup_output_directories();
   void InitSim();
   void RunSim();
-  void PostProcess(const int& iter_,  double& Resid_sum_);
+  void PostProcess(const int& iter_);
 
 protected:
   void logo();
