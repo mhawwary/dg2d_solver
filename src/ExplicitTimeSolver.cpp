@@ -23,6 +23,7 @@ void ExplicitTimeSolver::setupTimeSolver(SpaceSolver *o_space_solver_
 
     resid = new double[Ndof*Nelem];
     dt_ = space_solver->GetTimeStep();
+    IterNo=0;
 
     if(simdata->RK_order_>1){
         q_temp = new double[Nelem*Ndof];

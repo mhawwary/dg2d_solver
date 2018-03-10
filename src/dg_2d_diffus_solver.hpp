@@ -33,6 +33,8 @@ public:
     virtual void dump_errors(double& L1_proj_sol_,double& L2_proj_sol_);
 
     virtual double eval_init_sol(const double& xx_,const double& yy_);
+    virtual double eval_exact_sol(const double& xx_,const double& yy_
+                                  ,const double& tt_);
     virtual double eval_1dbasis_poly(const double& xi_, const int& basis_k_);
     virtual double eval_2dbasis_poly(const double& xi_,const double& eta_
                                      , const int& basis_k_);
@@ -55,6 +57,7 @@ public:
     void test_eval_2dbasis();
     void Compute_exact_vertex_sol_usingproj();
     void TestGhostElements();
+    void test_bilinearmap();
 
 private:
     void Reset_solver();

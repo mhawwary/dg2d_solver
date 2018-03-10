@@ -103,33 +103,33 @@ void DG_2D_DIFFUS_SOLVER::load_scheme_matrices(){
     }
     input.close();
 
-   // Reading scheme update matrices
-   fname_ = scheme_dir_+"K0.dat";
-   read_sparsematrix(K0,fname_);
-   fname_ = scheme_dir_+"K1.dat";
-   read_sparsematrix(K1,fname_);
-   fname_ = scheme_dir_+"K2.dat";
-   read_sparsematrix(K2,fname_);
-   fname_ = scheme_dir_+"K3.dat";
-   read_sparsematrix(K3,fname_);
-   fname_ = scheme_dir_+"L.dat";
-   read_sparsematrix(L,fname_);
-   fname_ = scheme_dir_+"Q.dat";
-   read_sparsematrix(Q,fname_);
-   fname_ = scheme_dir_+"Qp0.dat";
-   read_sparsematrix(Q0,fname_);
-   fname_ = scheme_dir_+"Qp1.dat";
-   read_sparsematrix(Q1,fname_);
-   fname_ = scheme_dir_+"Qp2.dat";
-   read_sparsematrix(Q2,fname_);
-   fname_ = scheme_dir_+"Qp3.dat";
-   read_sparsematrix(Q3,fname_);
+    // Reading scheme update matrices
+    fname_ = scheme_dir_+"K0.dat";
+    read_sparsematrix(K0,fname_);
+    fname_ = scheme_dir_+"K1.dat";
+    read_sparsematrix(K1,fname_);
+    fname_ = scheme_dir_+"K2.dat";
+    read_sparsematrix(K2,fname_);
+    fname_ = scheme_dir_+"K3.dat";
+    read_sparsematrix(K3,fname_);
+    fname_ = scheme_dir_+"L.dat";
+    read_sparsematrix(L,fname_);
+    fname_ = scheme_dir_+"Q.dat";
+    read_sparsematrix(Q,fname_);
+    fname_ = scheme_dir_+"Qp0.dat";
+    read_sparsematrix(Q0,fname_);
+    fname_ = scheme_dir_+"Qp1.dat";
+    read_sparsematrix(Q1,fname_);
+    fname_ = scheme_dir_+"Qp2.dat";
+    read_sparsematrix(Q2,fname_);
+    fname_ = scheme_dir_+"Qp3.dat";
+    read_sparsematrix(Q3,fname_);
 
-   return;
+    return;
 }
 
 void DG_2D_DIFFUS_SOLVER::read_sparsematrix(MYSPARSE_MATRIX& smatrix_
-                                             ,std::string& readfname_){
+                                            ,std::string& readfname_){
 
     double h2=0;
     h2 = 1.0/grid_->elemlist[0].Vc; // 1/h^2
@@ -185,8 +185,8 @@ double DG_2D_DIFFUS_SOLVER::eval_1dbasis_poly(const double &o_xi_, const int &ba
 }
 
 double DG_2D_DIFFUS_SOLVER::eval_2dbasis_poly(const double &o_xi_
-                                            , const double &o_eta_
-                                            , const int &basis_k_){
+                                              , const double &o_eta_
+                                              , const int &basis_k_){
     if(basis_k_>=Ndof){
         FatalError_exit("basis_k >= Ndof, eval_2d_basis");
         return 0.0;
@@ -210,8 +210,8 @@ double DG_2D_DIFFUS_SOLVER::eval_2dbasis_poly(const double &o_xi_
 }
 
 double DG_2D_DIFFUS_SOLVER::eval_bilinear_mapshapefunc(const double &o_xi_
-                                                     ,const double &o_eta_
-                                                     ,const int &o_index_){
+                                                       ,const double &o_eta_
+                                                       ,const int &o_index_){
     double o_epsi_=0.0;
 
     switch (o_index_) {
@@ -236,16 +236,17 @@ double DG_2D_DIFFUS_SOLVER::eval_bilinear_mapshapefunc(const double &o_xi_
 }
 
 void DG_2D_DIFFUS_SOLVER::eval_local_xy_coord(const int& o_eID_
-                                         ,const double &xi_
-                                         , const double &eta_
-                                          ,double& o_x_
-                                          ,double& o_y_){
+                                              ,const double &xi_
+                                              , const double &eta_
+                                              ,double& o_x_
+                                              ,double& o_y_){
     int nodeID_;
     double xn=0.0;
     double yn=0.0;
     double o_epsi_=0.0;
     o_x_=0.0;
     o_y_=0.0;
+
 
     register int i;
     for(i=0; i<grid_->elemlist[o_eID_].n_local_nodes; i++){
@@ -288,14 +289,14 @@ void DG_2D_DIFFUS_SOLVER::InitSol(){
                 Qn[j*Ndof+k] = initSol_legendre_proj(j,k,quad_2d_);
     }else{
         FatalError_exit("eqn_type is not implemented");
-    } 
+    }
 
     return;
 }
 
 double DG_2D_DIFFUS_SOLVER::initSol_legendre_proj(const int &eID,
-                                       const int &basis_k,
-                                        const GaussQuad2D &o_quad2d_){
+                                                  const int &basis_k,
+                                                  const GaussQuad2D &o_quad2d_){
 
     double xx=0.0,yy=0.0;
     double II=0.0;
@@ -304,10 +305,12 @@ double DG_2D_DIFFUS_SOLVER::initSol_legendre_proj(const int &eID,
 
     for (int i=0; i<o_quad2d_.Nq; i++){
         eval_local_xy_coord(eID,o_quad2d_.Gaus_pts[0][i]
-                             ,o_quad2d_.Gaus_pts[1][i],xx,yy);
+                ,o_quad2d_.Gaus_pts[1][i],xx,yy);
+
         Qinit_= eval_init_sol(xx,yy);
+
         Lk_ = eval_2dbasis_poly(o_quad2d_.Gaus_pts[0][i]
-                             ,o_quad2d_.Gaus_pts[1][i], basis_k);
+                ,o_quad2d_.Gaus_pts[1][i], basis_k);
         II += o_quad2d_.Gaus_wts[i] * Qinit_ * Lk_ ;
     }
     II = II / Lk_norm2sq[basis_k] ;
@@ -316,8 +319,8 @@ double DG_2D_DIFFUS_SOLVER::initSol_legendre_proj(const int &eID,
 }
 
 double DG_2D_DIFFUS_SOLVER::exactSol_legendre_proj(const int &eID,
-                                       const int &basis_k,
-                                        const GaussQuad2D &o_quad2d_){
+                                                   const int &basis_k,
+                                                   const GaussQuad2D &o_quad2d_){
 
     double xx=0.0,yy=0.0;
     double II=0.0;
@@ -326,17 +329,14 @@ double DG_2D_DIFFUS_SOLVER::exactSol_legendre_proj(const int &eID,
 
     for(int i=0; i<o_quad2d_.Nq; i++){
         eval_local_xy_coord(eID,o_quad2d_.Gaus_pts[0][i]
-                             ,o_quad2d_.Gaus_pts[1][i],xx,yy);
+                ,o_quad2d_.Gaus_pts[1][i],xx,yy);
         xx -= x_exact_sol_shift;
         yy -= y_exact_sol_shift;
 
-        if(simdata_->wave_form_==0)
-            Qexx_=eval_init_sol(xx,yy);
-        else if(simdata_->wave_form_==1)
-            Qexx_= eval_exact_trigsol_diffus(xx,yy,simdata_->t_end_);
+        Qexx_=eval_exact_sol(xx,yy,simdata_->t_end_);
 
         Lk_ = eval_2dbasis_poly(o_quad2d_.Gaus_pts[0][i]
-                             ,o_quad2d_.Gaus_pts[1][i], basis_k);
+                ,o_quad2d_.Gaus_pts[1][i], basis_k);
 
         II += o_quad2d_.Gaus_wts[i] * Qexx_ * Lk_ ;
     }
@@ -371,12 +371,92 @@ double DG_2D_DIFFUS_SOLVER::eval_init_sol(const double &xx_, const double&yy_){
             _notImplemented("y_wave_type");
 
         Qinit_ = simdata_->wave_amp_*o_x_wave_*o_y_wave_+simdata_->wave_const;
+
+    }else if(simdata_->wave_form_==2){ // Trigonometric2, periodic
+        double o_wave_=0.0;
+        if(simdata_->wave_type_=="sin")
+            o_wave_=sin(simdata_->x_wave_freq_*PI*xx_
+                        +simdata_->y_wave_freq_*PI*yy_
+                        +simdata_->wave_shift);
+        else if(simdata_->wave_type_=="cos")
+            o_wave_=cos(simdata_->x_wave_freq_*PI*xx_
+                        +simdata_->y_wave_freq_*PI*yy_
+                        +simdata_->wave_shift);
+        else
+            _notImplemented("wave_type");
+
+        Qinit_ = simdata_->wave_amp_*o_wave_+simdata_->wave_const;
+
+    }else if(simdata_->wave_form_==4){ // linear
+        Qinit_ = simdata_->slope_x * xx_
+                + simdata_->slope_y * yy_ + simdata_->lin_const_;
     }else{
         _notImplemented("wave form");
         FatalError_exit("not found waveform");
     }
 
     return Qinit_;
+}
+
+double DG_2D_DIFFUS_SOLVER::eval_exact_sol(const double &xx_, const double&yy_,
+                                           const double& tt_){
+
+    double Qexx_=0.0;
+
+    if(simdata_->wave_form_==0){ //KannanWang2009
+        Qexx_ = simdata_->wave_amp_
+                * sin(simdata_->wave_freq_*xx_+simdata_->wave_shift)
+                * exp(simdata_->exp_exponent_const*yy_);
+
+    }else if(simdata_->wave_form_==1){ //Trigonometric, periodic
+        double o_x_wave_=0.0,o_y_wave_=0.0;
+        if(simdata_->x_wave_type_=="sin")
+            o_x_wave_=sin(simdata_->x_wave_freq_*PI*xx_+simdata_->x_wave_phase);
+        else if(simdata_->x_wave_type_=="cos")
+            o_x_wave_=cos(simdata_->x_wave_freq_*PI*xx_+simdata_->x_wave_phase);
+        else
+            _notImplemented("x_wave_type");
+
+        if(simdata_->y_wave_type_=="sin")
+            o_y_wave_=sin(simdata_->y_wave_freq_*PI*yy_+simdata_->y_wave_phase);
+        else if(simdata_->x_wave_type_=="cos")
+            o_y_wave_=cos(simdata_->y_wave_freq_*PI*yy_+simdata_->y_wave_phase);
+        else
+            _notImplemented("y_wave_type");
+        double KK_=pow(simdata_->x_wave_freq_*PI,2)
+                + pow(simdata_->y_wave_freq_*PI,2);
+        Qexx_ = simdata_->wave_amp_*o_x_wave_*o_y_wave_
+                *exp(-KK_*simdata_->thermal_diffus*tt_)
+                +simdata_->wave_const;
+
+    }else if(simdata_->wave_form_==2){ // Trigonometric2, periodic
+        double o_wave_=0.0;
+        if(simdata_->wave_type_=="sin")
+            o_wave_=sin(simdata_->x_wave_freq_*PI*xx_
+                        +simdata_->y_wave_freq_*PI*yy_
+                        +simdata_->wave_shift);
+        else if(simdata_->wave_type_=="cos")
+            o_wave_=cos(simdata_->x_wave_freq_*PI*xx_
+                        +simdata_->y_wave_freq_*PI*yy_
+                        +simdata_->wave_shift);
+        else
+            _notImplemented("wave_type");
+
+        double KK_=pow(simdata_->x_wave_freq_*PI,2)
+                + pow(simdata_->y_wave_freq_*PI,2);
+        Qexx_ = simdata_->wave_amp_*o_wave_
+                *exp(-KK_*simdata_->thermal_diffus*tt_)
+                +simdata_->wave_const;
+
+    }else if(simdata_->wave_form_==4){ // linear
+        Qexx_ = simdata_->slope_x * xx_
+                + simdata_->slope_y * yy_ + simdata_->lin_const_;
+    }else{
+        _notImplemented("wave form");
+        FatalError_exit("not found waveform");
+    }
+
+    return Qexx_;
 }
 
 double DG_2D_DIFFUS_SOLVER::eval_exact_trigsol_diffus(const double &xx_
@@ -398,9 +478,29 @@ double DG_2D_DIFFUS_SOLVER::eval_exact_trigsol_diffus(const double &xx_
             o_y_wave_=cos(simdata_->y_wave_freq_*PI*yy_+simdata_->y_wave_phase);
         else
             _notImplemented("y_wave_type");
-        double KK_=pow(simdata_->x_wave_freq_,2)
-                + pow(simdata_->y_wave_freq_,2);
-        Qexx_ = simdata_->wave_amp_*o_x_wave_*o_y_wave_*exp(-KK_*tt_)
+        double KK_=pow(simdata_->x_wave_freq_*PI,2)
+                + pow(simdata_->y_wave_freq_*PI,2);
+        Qexx_ = simdata_->wave_amp_*o_x_wave_*o_y_wave_
+                *exp(-KK_*simdata_->thermal_diffus*tt_)
+                +simdata_->wave_const;
+
+    }else if(simdata_->wave_form_==2){ // Trigonometric2, periodic
+        double o_wave_=0.0;
+        if(simdata_->wave_type_=="sin")
+            o_wave_=sin(simdata_->x_wave_freq_*PI*xx_
+                        +simdata_->y_wave_freq_*PI*yy_
+                        +simdata_->wave_shift);
+        else if(simdata_->wave_type_=="cos")
+            o_wave_=cos(simdata_->x_wave_freq_*PI*xx_
+                        +simdata_->y_wave_freq_*PI*yy_
+                        +simdata_->wave_shift);
+        else
+            _notImplemented("wave_type");
+
+        double KK_=pow(simdata_->x_wave_freq_*PI,2)
+                + pow(simdata_->y_wave_freq_*PI,2);
+        Qexx_ = simdata_->wave_amp_*o_wave_
+                *exp(-KK_*simdata_->thermal_diffus*tt_)
                 +simdata_->wave_const;
     }else{
         _notImplemented("wave form");
@@ -428,11 +528,13 @@ void DG_2D_DIFFUS_SOLVER::Compute_exact_vertex_sol(){
     for(i=0; i<grid_->Nnodes; i++){
         xx=grid_->Xn[i]-x_exact_sol_shift;
         yy=grid_->Yn[i]-y_exact_sol_shift;
-        if(simdata_->wave_form_==1){
-            Qv_exact[i] = eval_exact_trigsol_diffus(xx,yy,simdata_->t_end_);
-        }else{
-            Qv_exact[i] = eval_init_sol(xx,yy);
-        }
+//        if(simdata_->wave_form_==1 ||
+//                simdata_->wave_form_==2){
+//            Qv_exact[i] = eval_exact_trigsol_diffus(xx,yy,simdata_->t_end_);
+//        }else{
+//            Qv_exact[i] = eval_exact_sol(xx,yy,simdata_->t_end_);
+//        }
+        Qv_exact[i] = eval_exact_sol(xx,yy,simdata_->t_end_);
     }
     return;
 }
@@ -543,21 +645,17 @@ void DG_2D_DIFFUS_SOLVER::CalcTimeStep(){
     std::cout << "CFL no.        : "<<CFL<<std::endl;
     std::cout << "time step, dt  : "<<time_step<<std::endl;
     std::cout << "last_time_step : "<<last_time_step<<std::endl;
-    std::cout << "input Nperiods : "<<simdata_->Nperiods<<std::endl;
-    std::cout << "new   Nperiods : "<<simdata_->t_end_/T_period<<std::endl;
-    std::cout << "x_exact_sol_shift: "<<x_exact_sol_shift<<std::endl;
-    std::cout << "y_exact_sol_shift: "<<y_exact_sol_shift<<std::endl;
-    std::cout << "T_period       : "<<T_period<<std::endl;
     printf("actual_end_time:%1.5f",simdata_->t_end_);
     std::cout <<"\nMax_iter: "<<simdata_->maxIter_<<std::endl;
 
     std::cout << "\nNumber of Elements: "<< grid_->Nelem<< std::endl;
-    std::cout << "Polynomial  order : "<< Porder  << std::endl;
-    std::cout << "Runge-Kutta order : "<< simdata_->RK_order_    << std::endl;
-    std::cout << "Upwind parameter  : "<< simdata_->upwind_param_<< std::endl;
-    std::cout << "Penalty parameter : "<< eta_face << std::endl;
-    std::cout << "Poly GaussQuad order  : "<< Nquad_2d << std::endl;
+    std::cout << "Polynomial  order  : "<< Porder  << std::endl;
+    std::cout << "Runge-Kutta order  : "<< simdata_->RK_order_    << std::endl;
+    std::cout << "Penalty parameter  : "<< eta_face << std::endl;
+    std::cout << "GaussQuad order    :  "<< Nquad_2d << std::endl;
     std::cout << "Jacobian: " <<grid_->elemlist[0].Jc<<std::endl;
+    std::cout << "h       :" <<grid_->facelist[0].Af<<std::endl;
+    std::cout << "Vol     : "<<grid_->elemlist[0].Vc<<std::endl;
     std::cout <<"===============================================\n";
 }
 
@@ -574,7 +672,8 @@ double DG_2D_DIFFUS_SOLVER::evalSolution(const double *q_
 
 void DG_2D_DIFFUS_SOLVER::UpdateResid(double *o_resid_, double *o_qn_){
 
-    for(register int i=0; i<grid_->Nelem; i++)
+    register int i;
+    for(i=0; i<grid_->Nelem; i++)
         UpdateResidOneCell(i,&o_resid_[i*Ndof],o_qn_);
 
     return;
@@ -589,7 +688,7 @@ void DG_2D_DIFFUS_SOLVER::UpdateResidOneCell(const int &eID_, double *resid_
     int fID_[4]={0,0,0,0};
     int iR_[4]={0,0,0,0};
     int i,j;
-    double Ik;
+    double II_;
 
     for(i=0; i<grid_->elemlist[eID_].n_local_faces; i++){
         fID_[i]=grid_->elemlist[eID_].to_face[i];
@@ -607,57 +706,61 @@ void DG_2D_DIFFUS_SOLVER::UpdateResidOneCell(const int &eID_, double *resid_
 
     //current element contribution:
     for(j=0; j<L.nnz_; j++){
-        Ik = L.val[j] * qn_[eID_*Ndof+L.ix[1][j]];
-        resid_[L.ix[0][j]] +=Ik;
+        II_ = L.val[j] * qn_[eID_*Ndof+L.ix[1][j]];
+        resid_[L.ix[0][j]] +=II_;
     }
+
     for(j=0; j<Q.nnz_; j++){
-        Ik = eta_face*Q.val[j] * qn_[eID_*Ndof+Q.ix[1][j]];
-        resid_[Q.ix[0][j]] +=Ik;
+        II_ = eta_face*Q.val[j] * qn_[eID_*Ndof+Q.ix[1][j]];
+        resid_[Q.ix[0][j]] +=II_;
     }
 
     //face0:
     i=0;
     for(j=0; j<K0.nnz_; j++){
-        Ik = K0.val[j] * qn_[iR_[i]*Ndof+K0.ix[1][j]];
-        resid_[K0.ix[0][j]] +=Ik;
+        II_ = K0.val[j] * qn_[iR_[i]*Ndof+K0.ix[1][j]];
+        resid_[K0.ix[0][j]] +=II_;
     }
     for(j=0; j<Q0.nnz_; j++){
-        Ik = eta_face*Q0.val[j] * qn_[iR_[i]*Ndof+Q0.ix[1][j]];
-        resid_[Q0.ix[0][j]] +=Ik;
+        II_ = eta_face*Q0.val[j] * qn_[iR_[i]*Ndof+Q0.ix[1][j]];
+        resid_[Q0.ix[0][j]] +=II_;
     }
 
     //face1:
     i=1;
     for(j=0; j<K1.nnz_; j++){
-        Ik = K1.val[j] * qn_[iR_[i]*Ndof+K1.ix[1][j]];
-        resid_[K1.ix[0][j]] +=Ik;
+        II_ = K1.val[j] * qn_[iR_[i]*Ndof+K1.ix[1][j]];
+        resid_[K1.ix[0][j]] +=II_;
     }
     for(j=0; j<Q1.nnz_; j++){
-        Ik = eta_face*Q1.val[j] * qn_[iR_[i]*Ndof+Q1.ix[1][j]];
-        resid_[Q1.ix[0][j]] +=Ik;
+        II_ = eta_face*Q1.val[j] * qn_[iR_[i]*Ndof+Q1.ix[1][j]];
+        resid_[Q1.ix[0][j]] +=II_;
     }
+
+
     //face2:
     i=2;
     for(j=0; j<K2.nnz_; j++){
-        Ik = K2.val[j] * qn_[iR_[i]*Ndof+K2.ix[1][j]];
-        resid_[K2.ix[0][j]] +=Ik;
+        II_ = K2.val[j] * qn_[iR_[i]*Ndof+K2.ix[1][j]];
+        resid_[K2.ix[0][j]] +=II_;
     }
     for(j=0; j<Q2.nnz_; j++){
-        Ik = eta_face*Q2.val[j] * qn_[iR_[i]*Ndof+Q2.ix[1][j]];
-        resid_[Q2.ix[0][j]] +=Ik;
+        II_ = eta_face*Q2.val[j] * qn_[iR_[i]*Ndof+Q2.ix[1][j]];
+        resid_[Q2.ix[0][j]] +=II_;
     }
+
     //face3:
     i=3;
     for(j=0; j<K3.nnz_; j++){
-        Ik = K3.val[j] * qn_[iR_[i]*Ndof+K3.ix[1][j]];
-        resid_[K3.ix[0][j]] +=Ik;
+        II_ = K3.val[j] * qn_[iR_[i]*Ndof+K3.ix[1][j]];
+        resid_[K3.ix[0][j]] +=II_;
     }
     for(j=0; j<Q3.nnz_; j++){
-        Ik = eta_face*Q3.val[j] * qn_[iR_[i]*Ndof+Q3.ix[1][j]];
-        resid_[Q3.ix[0][j]] +=Ik;
+        II_ = eta_face*Q3.val[j] * qn_[iR_[i]*Ndof+Q3.ix[1][j]];
+        resid_[Q3.ix[0][j]] +=II_;
     }
 
-    for(i=0; i<Ndof; i++)  // multiplying by gamma
+    for(i=0; i<Ndof; i++)  // multiplying by gamma, diffusivity
         resid_[i]=resid_[i]*simdata_->thermal_diffus;
 
     return;
@@ -701,7 +804,6 @@ double DG_2D_DIFFUS_SOLVER::L1_error_projected_sol(){
                     ,quad_2d_.Gaus_pts[0][i], quad_2d_.Gaus_pts[1][i]);
             elem_error += quad_2d_.Gaus_wts[i] * fabs(q_ex - q_n);
         }
-
         II  += (grid_->elemlist[j].Jc * elem_error) ;
         VV_ += grid_->elemlist[j].Vc;
     }
@@ -747,7 +849,8 @@ void DG_2D_DIFFUS_SOLVER::dump_errors(double& L1_proj_sol_,double& L2_proj_sol_)
                 ,simdata_->t_end_);
 
         FILE* solerror_out=fopen(fname,"at+");
-        fprintf(solerror_out, "%d %2.10e %2.10e\n",grid_->Nelem,L1_proj_sol_,L2_proj_sol_);
+        fprintf(solerror_out, "%d %2.10e %2.10e\n"
+                ,grid_->Nelem,L1_proj_sol_,L2_proj_sol_);
         fclose(solerror_out);
         emptyarray(fname);
 
@@ -778,19 +881,19 @@ void DG_2D_DIFFUS_SOLVER::dump_errors(double& L1_proj_sol_,double& L2_proj_sol_)
         fclose(solerror_out);
         emptyarray(fname);
 
-         // Dumping all errors in one file as a function of Nelem:
-         //--------------------------------------------------------
-         fname = new char[100];
-         sprintf(fname,"%serrors/errors_dt%1.3e_eta%1.2f_t%1.3f.dat"
-                 ,simdata_->case_postproc_dir.c_str()
-                 ,time_step
-                 ,eta_face
-                 ,simdata_->t_end_);
+        // Dumping all errors in one file as a function of Nelem:
+        //--------------------------------------------------------
+        fname = new char[100];
+        sprintf(fname,"%serrors/errors_dt%1.3e_eta%1.2f_t%1.3f.dat"
+                ,simdata_->case_postproc_dir.c_str()
+                ,time_step
+                ,eta_face
+                ,simdata_->t_end_);
 
-         solerror_out=fopen(fname,"at+");
-         fprintf(solerror_out, "%d %2.10e %2.10e\n",grid_->Nelem,L1_proj_sol_,L2_proj_sol_);
-         fclose(solerror_out);
-         emptyarray(fname);
+        solerror_out=fopen(fname,"at+");
+        fprintf(solerror_out, "%d %2.10e %2.10e\n",grid_->Nelem,L1_proj_sol_,L2_proj_sol_);
+        fclose(solerror_out);
+        emptyarray(fname);
 
     }else if( simdata_->Sim_mode=="test" || simdata_->Sim_mode=="normal" ){
         sprintf(fname,"%serrors/errors_N%d_CFL%1.3e_eta%1.2f_t%1.3f.dat"
@@ -837,7 +940,7 @@ void DG_2D_DIFFUS_SOLVER::dump_errors(double& L1_proj_sol_,double& L2_proj_sol_)
 }
 
 
-//Debug functions:
+//Debug functions
 void DG_2D_DIFFUS_SOLVER::test_local_xy_coord(){
 
     double xx=0.0,yy=0.0;
@@ -848,9 +951,9 @@ void DG_2D_DIFFUS_SOLVER::test_local_xy_coord(){
                     ,quad_2d_.Gaus_pts[1][i],xx,yy);
 
             std::cout<<"xi:"<<quad_2d_.Gaus_pts[0][i]<<" "
-                     <<"eta:"<<quad_2d_.Gaus_pts[1][i]<<" "
-                     <<"xx:"<<xx<<" "
-                     <<"yy:"<<yy<<" "<<std::endl;
+                    <<"eta:"<<quad_2d_.Gaus_pts[1][i]<<" "
+                   <<"xx:"<<xx<<" "
+                  <<"yy:"<<yy<<" "<<std::endl;
         }
         std::cin.get();
     }
@@ -866,7 +969,7 @@ void DG_2D_DIFFUS_SOLVER::test_eval_2dbasis(){
 
     for(int j=0; j<4; j++){
         std::cout<<"xi:"<<xi_pt_[j]<<",   "
-                 <<"eta:"<<eta_pt_[j]<<"\n";
+                <<"eta:"<<eta_pt_[j]<<"\n";
         for(int k=0; k<Ndof; k++){
             LL=eval_2dbasis_poly(xi_pt_[j],eta_pt_[j],k);
             std::cout<<"L"<<k<<": "<<LL<<" "<<std::endl;
@@ -874,8 +977,8 @@ void DG_2D_DIFFUS_SOLVER::test_eval_2dbasis(){
             jj = k%(Porder+1);       // column 1D position for xi dir
 
             std::cout<<"\nk:"<<k<<",  "
-                     <<"eta_i="<<ii<<"  "
-                     <<"xi_j="<<jj<<std::endl;
+                    <<"eta_i="<<ii<<"  "
+                   <<"xi_j="<<jj<<std::endl;
 
         }
     }
@@ -913,19 +1016,33 @@ void DG_2D_DIFFUS_SOLVER::TestGhostElements(){
     register int i;
 
     int iL,iR;
-//    double Xc0,Xc1,Yc0,Yc1;
+    //    double Xc0,Xc1,Yc0,Yc1;
 
     for(i=0; i<grid_->Nbndfaces; i++){
         iL = grid_->facelist[i].Lcell;
         iR = grid_->facelist[i].Rcell;
         std::cout<<"fID:"<<grid_->facelist[i].ID<<"  "
                 <<"iL:"<<iL<<", "<<grid_->elemlist[iL].bnd_type<<"  "
-                <<"iR:"<<iR<<", "<<grid_->elemlist[iR].bnd_type<<std::endl;
+               <<"iR:"<<iR<<", "<<grid_->elemlist[iR].bnd_type<<std::endl;
 
         std::cin.get();
 
-//        for(k=0; k<Ndof; k++)
-//            Qn[iR*Ndof+k] = Qn[iR*Ndof+k];
+        //        for(k=0; k<Ndof; k++)
+        //            Qn[iR*Ndof+k] = Qn[iR*Ndof+k];
+    }
+    return;
+}
+
+void DG_2D_DIFFUS_SOLVER::test_bilinearmap(){
+
+    int i;
+    double xx,yy;
+
+    int eID=0;
+
+    for (i=0; i<quad_2d_.Nq; i++){
+        eval_local_xy_coord(eID,quad_2d_.Gaus_pts[0][i]
+                ,quad_2d_.Gaus_pts[1][i],xx,yy);
     }
     return;
 }

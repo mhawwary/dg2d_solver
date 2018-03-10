@@ -59,6 +59,14 @@ struct SimData {
     double wave_const = 0.0; // C
     double x_wave_phase = 0.0; // dphy_x
     double y_wave_phase = 0.0; // dphy_y
+    /* ../Trigonometric2 , sine or cosine
+     * u(x,y,t) = A * sin ( fx  x + fy y + dphy ) * exp(-gamma*(fx^2+fy^2) * t) + C
+     * */
+    std::string wave_type_;  // sin/cos
+    // ../linear,  u(x,y)= sx * x + sy * y + c
+    double slope_x = 1.0;
+    double slope_y = 1.0;
+    double lin_const_ = 0.0;
     // ../Gaussian , u(x) = A * exp( M *x^2) :
     double Gaussian_amp_ = 1.0;   // A
     double Gaussian_exponent_ = -40;  // M

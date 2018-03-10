@@ -52,9 +52,15 @@ void SimData::Parse(const std::string &fname){
     y_wave_phase=gp_input("wave/Trigonometric/y_wave_phase",0.0);
     wave_amp_=gp_input("wave/Trigonometric/wave_amplitude",1.0);
     wave_const=gp_input("wave/Trigonometric/wave_const",0.0);
+    //../Trigonometric2:
+    wave_type_=gp_input("wave/Trigonometric2/wave_type","Sin");
     // ../Gaussian:
     Gaussian_amp_ = gp_input("wave/Gaussian/Gaussian_amplitude",1.0);
     Gaussian_exponent_ = gp_input("wave/Gaussian/Gaussian_exponent",-50.0);
+    //../linear
+    slope_x = gp_input("wave/linear/slope_x",1.0);
+    slope_y = gp_input("wave/linear/slope_y",1.0);
+    lin_const_ = gp_input("wave/linear/lin_const_",0.0);
 
     // Space Solver parameters:
     //-----------------------------

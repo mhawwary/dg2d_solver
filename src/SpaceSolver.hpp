@@ -106,6 +106,8 @@ protected:
                                               ,const int& index_)=0;
 
     virtual double eval_init_sol(const double& xx_,const double& yy_)=0;
+    virtual double eval_exact_sol(const double& xx_,const double& yy_
+                                                   ,const double& tt_)=0;
     virtual double eval_1dbasis_poly(const double& xi_, const int& basis_k_)=0;
     virtual double eval_2dbasis_poly(const double& xi_,const double& eta_
                                      , const int& basis_k_)=0;

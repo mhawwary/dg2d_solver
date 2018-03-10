@@ -1,11 +1,11 @@
 [Case]
- title = cart_test1
+ title = OAA_conv
  postprocess_dir = ./results/
  mesh_file_name = ./mesh/cartmesh8x8.in
  grid_type = Cartesian
  generate_grid_flag = 1
- Nnodes_x = 5   
- Nnodes_y = 5
+ Nnodes_x = 65 
+ Nnodes_y = 65
  x_begin = 0.0
  x_end   = 1.0
  y_begin = 0.0
@@ -14,16 +14,16 @@
  refinement_level = 0    # 1: if mesh refinement is introduced
 
 [Simulation] 
- unsteady_data_print_flag = 0
- unsteady_data_print_iter = 5
- unsteady_data_print_time  = 0.005  # time point for print of unsteady data
+ unsteady_data_print_flag = 2     # 0: use iter , 1: use time , 2: print each time step exactly
+ unsteady_data_print_iter = 500     # iter no. for print of unsteady data 
+ unsteady_data_print_time  = 0.2  # time point for print of unsteady data
  restart_flag = 0   # 0: no-restart, 1: restart from restart file
  restart_iter = 1e6
- mode = normal
+ mode = error_analysis_CFL  # normal/test/error_analysis_dt/error_analysis_CFL/
  case_no = 64
  
 [wave]
- wave_form = 1 ;      # 0: KannanWang2009, 1:Trigonometric
+ wave_form = 1 ;      # 0: KannanWang2009, 1:Trigonometric , 2:Trigonometric2 , 3: Gaussian, 4: linear
  x_wave_speed = 1.0;    # for linear advection or linear Advec_Diffus
  y_wave_speed = 1.0;    # for linear advection or linear Advec_Diffus
 
@@ -43,6 +43,16 @@
      y_wave_phase = 0.0   # dphy_y
      wave_const = 0.0       # C
      
+ [../Trigonometric2]    # u(x,y,t) = A * sin ( fx  x + fy y + dphy ) * exp(-gamma*(fx^2+fy^2) * t) + C
+     wave_type = sin  # cos / sin
+     #x_wave_freq = 2.0       # fx/pi
+     #y_wave_freq = 2.0       # fy/pi
+     
+ [../linear]  u(x,y)= sx * x + sy * y + c
+    slope_x = 1.0
+    slope_y = 1.0
+    lin_const_=0.0;
+     
  [../Gaussian]
    Gaussian_exponent = 38.6  # u(x) = A * exp(-38.6 *x^2)
    Gaussian_amplitude = 1.0
@@ -50,7 +60,7 @@
 [space_solver]
  eqn_set = Diffusion  # Advection / Diffusion / Advection_Diffusion
  eqn_type = linear_diffus # linear_advec / linear_diffus / linear_advec_diffus
- polynomial_order = 1
+ polynomial_order = 2
  schemes_data_dir = ./schemes_data/
  
   [./advec_eqn]
@@ -58,19 +68,19 @@
   
  [../heat_eqn]
   penalty_param = 1.00
-  thermal_diffusivity = 1.0
+  thermal_diffusivity = 0.01
   diffus_scheme_type = BR2 # SIP/BR2 
   elem_matrices_dir = ./input/
  
 [time_solver]
- calculate_dt_flag = 1
+ calculate_dt_flag = 1  # 0: specify dt and calc CFL, 1: specify CFL and calc dt
  calc_dt_adv_diffus_flag = 1 # 0: based on advection, 1: based on diffusion, 2: based on combined advection-diffusion
- CFL_no = 0.06741
+ CFL_no = 0.005
  dt = 1e-05
  initial_time = 0.0
- final_time = 0.05
+ final_time = 0.5
  no_of_periods = 1.0  #  period = (xf-x0) / wave_speed
- maximum_iteration = 10 ;
+ maximum_iteration = 5 ;
 
  end_of_simulation_flag = 1
 # 0: use no. of periods to setup the maxIter,
@@ -78,6 +88,6 @@
 # 2: use max_iteration as a stopping criteria if not converged or diverged
 
  [./explicit]
-   RK_order = 2
+   RK_order = 3
  
  

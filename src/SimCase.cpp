@@ -109,12 +109,12 @@ void SimCase::InitSim(){
 
 void SimCase::RunSim(){
 
-    int n_iter_print;
-    int local_iter=0;
+    int n_iter_print;   // no. of iterations to print unsteady data
+    int local_iter=0;   // counter to count the iter for printing
     double gtime = dg_solver_->GetPhyTime();
     double dt_= dg_solver_->GetTimeStep();
     double dt_last_print=0.0;
-    double temp_tol=1e-8;
+    double temp_tol=1e-10;
 
     if(simdata.unsteady_data_print_flag_==0){      // use iter_print to print
         n_iter_print = simdata.unsteady_data_print_iter_;
@@ -166,7 +166,7 @@ void SimCase::RunSim(){
     // main solution loop:
     if(simdata.unsteady_data_print_flag_==0
             || simdata.unsteady_data_print_flag_==1){
-        while ( gtime < (simdata.t_end_-(1+1e-5)*(dt_+1e-10))){
+        while ( fabs(gtime - simdata.t_end_) > (dt_+temp_tol) ){
             time_solver_->SolveOneStep(dg_solver_->GetNumSol());
             time_solver_->space_solver->UpdatePhyTime(dt_);
             gtime=dg_solver_->GetPhyTime();
@@ -184,11 +184,10 @@ void SimCase::RunSim(){
                 local_iter=0;
             }
         }
-        //PostProcess(time_solver_->GetIter());
+        PostProcess(time_solver_->GetIter());
 
     }else if(simdata.unsteady_data_print_flag_==2){
         while ( fabs(gtime - simdata.t_end_) > (dt_+temp_tol) ){
-
             time_solver_->SolveOneStep(dg_solver_->GetNumSol());
             time_solver_->space_solver->UpdatePhyTime(dt_);
             gtime=dg_solver_->GetPhyTime();
@@ -211,14 +210,17 @@ void SimCase::RunSim(){
             time_solver_->space_solver->UpdatePhyTime(dt_);
 
         PostProcess(time_solver_->GetIter());
+        printf("\nIter No:%d, time: %1.5f",time_solver_->GetIter(),gtime);
     }
     dump_exactsol_field_data(dg_solver_->GetVertexExactSol()
                           ,time_solver_->GetIter()
                           ,simdata.case_postproc_dir,grid_data);
     double L1_proj=dg_solver_->GetL1projSolerror();
     double L2_proj=dg_solver_->GetL2projSolerror();
-    std::cout<<"\nL1_proj: "<<L1_proj<<"   "<<"L2_proj: "<<L2_proj<<"\n";
     dg_solver_->dump_errors(L1_proj,L2_proj);
+    printf("\nfinal IterNo:%d, final time: %1.5f"
+           ,time_solver_->GetIter(),dg_solver_->GetPhyTime());
+    printf("\nL1_Error: %e , L2_Error: %e\n",L1_proj, L2_proj);
     return;
 }
 
